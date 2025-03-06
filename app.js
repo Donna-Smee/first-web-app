@@ -5,7 +5,7 @@ const PORT = 3000; // put this as variable later maybe
 
 // Create Prometheus metrics
 const httpRequestDurationMicroseconds = new promClient.Counter({
-    name: 'http_request_duration_seconds',
+    name: 'http_request_duration_seconds_total',
     help: 'Duration of HTTP requests in seconds',
     labelNames: ['method', 'status'],
   });
@@ -18,11 +18,13 @@ const httpRequestDurationMicroseconds = new promClient.Counter({
 
 // Simple hello world endpoint
 app.get("/", (req, res, next) => {
+    httpRequestDurationMicroseconds.inc({ method: 'GET', status: '200' }); // Increment counter for successful GET request
     res.sendFile(__dirname + '/public/index.html');
 });
 
 // Error route for testing error cases (500 errors)
 app.get('/error', (req, res) => {
+    httpRequestDurationMicroseconds.inc({ method: 'GET', status: '500' }); // Increment counter for error
     res.status(500).send('Server Error');
   });
   
